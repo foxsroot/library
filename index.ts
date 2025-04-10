@@ -1,61 +1,37 @@
 import express, { json, Request, Response, NextFunction } from "express";
-import { sequelize, Book, Author} from "./models/index";
-import * as bookController from './controllers/bookController';
-import * as authorController from './controllers/bookController';
-import { validateUUID } from './middlewares/validateUUID';
+import { sequelize } from "./models/index";
+import { errorHandler  } from "./middlewares/errorHandler";
+import authorRoutes from './routes/authorRoutes';
+import bookRoutes from './routes/bookRoutes';
 
 const config = require("./config/config.json");
 const app = express();
 
+sequelize.sync()
+  .then(() => {
+    console.log("Database synced!");
+  })
+  .catch((err) => {
+    console.error("Failed to sync database:", err);
+  });
+  
 app.use(json());
 
 app.get("/", (req, res, next) => {
     res.status(200).json({
-        message: "Welcome to our library System"
+        message: "Welcome to our library System."
     });
 
     next();
 });
 
-app.get("/books", async (req, res, next) => {
-    try {
-        const result = await bookController.default.getAllBooks();
-        res.status(200).json(result);
-    } catch (e) {
-        next(new Error("Internal Server Error"));
-        return;
-    }    
-});
+// Routes
+app.use("/authors", authorRoutes);
+app.use("/books", bookRoutes);
 
-app.get("/books/:id", async (req, res, next) => {
-    try {
-        const result = await bookController.default.getBookById(req.params.id);
-    } catch (e) {
-        next(new Error("Book not found"));
-        return;
-    }
-});
-
-app.post("/books", (req, res, next) => {
-
-});
-
-
-app.get("/authors", (req, res, next) => {
-
-});
-
-app.get("/authors/:id", (req, res, next) => {
-
-});
+// Error Handler
+app.use(errorHandler);
 
 app.listen(3000, () => {
     console.log("App started at port 3000")
 });
-
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-    res.status(500).json({
-        message: err.message
-    });
-})
-
