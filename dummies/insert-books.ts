@@ -1,7 +1,7 @@
-import { Book, sequelize } from './models/index';
+import { Book, sequelize } from '../models/index';
 
 async function insertBooks() {
-    sequelize.sync();
+    await sequelize.sync();
 
     await Book.bulkCreate([
         {

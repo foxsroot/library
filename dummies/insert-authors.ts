@@ -1,4 +1,4 @@
-import { sequelize, Book, Author } from './models/index';
+import { Author, sequelize } from '../models/index';
 
 async function insertAuthors() {
     await sequelize.sync();

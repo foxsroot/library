@@ -1,4 +1,4 @@
-import { Book, sequelize } from '../models/index';
+import { Book } from '../models/index';
 
 async function getAllBooks() {
     const books = await Book.findAll();

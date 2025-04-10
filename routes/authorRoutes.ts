@@ -21,10 +21,59 @@ router.get("/:id", validateUUID('id'), async (req, res, next) => {
         if (author) {
             res.status(200).json(author);
         } else {
-            next(new ApiError(404, "Can't find book with specified ID"));
+            next(new ApiError(404, "Can't find author with specified ID"));
         }
     } catch (e) {
         next(new Error("Failed to fetch author data"));
+    }
+});
+
+router.post("/", async (req, res, next) => {
+    const { name, dateOfBirth } = req.body;
+
+    if (!name) {
+        return next(new ApiError(400, "Name must be specified"));
+    }
+
+    try {
+        const author = await authorController.postAuthor(name, dateOfBirth);
+        res.status(200).json(author);
+    } catch (e) {
+        next(new ApiError(500, "Failed to post author data"));
+    }
+});
+
+router.delete("/:id", validateUUID('id'), async (req, res, next) => {
+    try {
+        const affectedRow = await authorController.deleteAuthor(req.params.id);
+
+        if (affectedRow) {
+            res.status(200).json("Successfully deleted Author with id " + req.params.id);
+        } else {
+            next(new ApiError(500, "Failed to find Author with specified ID"));
+        }
+    } catch(e) {
+        next(new ApiError(500, "Failed to delete Author"));
+    }
+});
+
+router.put("/:id", validateUUID('id'), async (req, res, next) => {
+    const { name, dateOfBirth } = req.body;
+
+    if (!name || !dateOfBirth) {
+        return next(new ApiError(400, "Name must be specified"))
+    }
+
+    try {
+        const author = await authorController.updateAuthor(req.params.id, name, dateOfBirth);
+
+        if (author) {
+            res.status(200).json(author);
+        } else {
+            next(new ApiError(404, "Failed to find Author with specified ID"));
+        }
+    } catch (e) {
+        next(new ApiError(500, "Failed to update Author data"));
     }
 });
 
