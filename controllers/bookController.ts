@@ -1,4 +1,5 @@
 import { Book } from '../models/index';
+import { Op } from 'sequelize';
 
 async function getAllBooks() {
     const books = await Book.findAll();
